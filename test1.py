@@ -2,7 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 
-plt.rcParams['font.family'] = 'Malgun Gothic'
+import platform
+if platform.system() == 'Windows':
+    plt.rcParams['font.family'] = 'Malgun Gothic'
+else:
+    plt.rcParams['font.family'] = 'NanumGothic'
 plt.rcParams['axes.unicode_minus'] = False
 
 # ============================================================

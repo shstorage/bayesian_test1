@@ -1,6 +1,15 @@
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+# ============================================================
+# 설정: "cpu" 또는 "gpu"
+# ============================================================
+DEVICE = "cuda"  # "cpu" or "cuda"
+
+import os
+os.environ["JAX_PLATFORMS"] = DEVICE
+
+import jax
 import pymc as pm
 import numpy as np
 import pandas as pd
@@ -8,7 +17,14 @@ import arviz as az
 import matplotlib.pyplot as plt
 from scipy import stats
 
-plt.rcParams['font.family'] = 'Malgun Gothic'
+N_CHAINS = 4 if DEVICE == "cpu" else 1
+print(f"[설정] device={DEVICE}, chains={N_CHAINS}, jax devices={jax.devices()}")
+
+import platform
+if platform.system() == 'Windows':
+    plt.rcParams['font.family'] = 'Malgun Gothic'
+else:
+    plt.rcParams['font.family'] = 'NanumGothic'
 plt.rcParams['axes.unicode_minus'] = False
 
 # ============================================================
@@ -73,7 +89,7 @@ with pm.Model() as model:
     y_obs = pm.Normal("y_obs", mu=mu_hat, sigma=eps, observed=df.thickness.values)
 
     # MCMC
-    trace = pm.sample(1000, tune=1000, target_accept=0.9, nuts_sampler="numpyro")
+    trace = pm.sample(1000, tune=1000, target_accept=0.9, nuts_sampler="numpyro", chains=N_CHAINS)
 
 # ============================================================
 # 3. 사후분포에서 Order Statistic (min) 추출
